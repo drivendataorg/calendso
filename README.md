@@ -20,6 +20,31 @@
   </p>
 </p>
 
+## Custom heroku deployment steps:
+ 1. [Add Procfile](Procfile)
+ 2. Create Heroku application
+ 3. Configure [heroku Postgres add-on](https://docs.calendso.com/docs/heroku-db)
+ 4. Configure [Google API access and add credentials to Heroku application settings](https://docs.calendso.com/docs/integrations/google) (not `.env` as suggested in the docs)
+ 5. Configure setting `NEXTAUTH_URL=https://<heroku app url>`
+ 6. Configure setting `PORT=80`
+ 7. Connect Heroku to the GitHub repo to deploy on push
+ 8. Initialize database for the first time
+   - Copy database URL settings from Heroku application settings
+   - **Temporarily connect to prod db:** Set that database URL in the [prisma/schema.prisma](prisma/schema.prisma)
+   - Run `npx prisma db push` to initialize the database tables
+   - **Revert changes to `schema.prisma` that have the prod db**
+ 9. Add user manually to database:
+   - **Temporarily connect to prod db:** Set heroku database URL in the [prisma/schema.prisma](prisma/schema.prisma)
+   - Use [Prisma studio](https://www.prisma.io/studio) to open `schema.prisma` and connect to prod database
+   - Add username, name, email
+   - Set initial password by pasting [bcrypted password](https://bcrypt-generator.com/) into password field. Make sure there is no exta whitespace on either side
+   - Tell user to change password on login
+   - Tell user to authorize Google Calendar integration through their
+   - **Revert changes to `schema.prisma` that have the prod db**
+
+11. Go to the Heroku app URL and login with the username and password
+
+
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
@@ -162,6 +187,9 @@ Contributions are what make the open source community such an amazing place to b
 5. Use **Application (client) ID** as the **MS_GRAPH_CLIENT_ID** attribute value in .env
 6. Click **Certificates & secrets** create a new client secret and use the value as the **MS_GRAPH_CLIENT_SECRET** attriubte
 
+#
+  
+  
 <!-- LICENSE -->
 ## License
 
